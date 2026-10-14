@@ -3,6 +3,7 @@ use opencv::{
     core::{Mat, Point2f, Ptr, Vector},
     imgcodecs,
 };
+use std::{collections::HashMap};
 
 pub struct Detector {
     dictionary: Ptr<aruco::Dictionary>,
@@ -33,7 +34,7 @@ impl Detector {
         Self { dictionary, parameters }
     }
 
-    pub fn detect(&self, img: &Img) -> Vec<(i32, Vector<Point2f>)> {
+    pub fn detect(&self, img: &Img) -> HashMap<i32, Vector<Point2f>> {
         let mut corners = Vector::<Vector<Point2f>>::new();
         let mut ids = Vector::<i32>::new();
         let mut rejected = Vector::<Vector<Point2f>>::new();
@@ -47,7 +48,7 @@ impl Detector {
             &mut rejected,
         ).unwrap();
 
-        ids.iter().zip(corners.iter()).collect()
+        HashMap::from_iter(ids.iter().zip(corners.iter()))
     }
 
     pub fn read_image(&self, path: &str) -> Img {
