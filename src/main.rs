@@ -1,4 +1,5 @@
 mod goal;
+mod detection;
 use goal::GoalClient;
 use std::{thread, time::Duration};
 
@@ -8,6 +9,13 @@ fn get_current_location() -> String {
 }
 
 fn main() {
+    let detector = detection::detector::Detector::new();
+    let img = detector.read_image("uber/img1.png");
+    let corners = detector.detect(&img);
+    for corner in corners {
+        println!("{:?}", corner);
+    }
+    
     let goals = GoalClient::new("http://192.168.0.19:8000/goal");
 
     loop {
