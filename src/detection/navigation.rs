@@ -131,6 +131,7 @@ impl Default for State {
     }
 }
 
+#[derive(Clone)]
 pub enum StateEnum {
     Initializing,
     NotFound,

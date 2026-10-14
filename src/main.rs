@@ -4,10 +4,11 @@ mod detection;
 mod image_fetcher;
 
 use goal::GoalClient;
-use detection::navigation::{State, StateEnum};
+use detection::navigation::{State, StateEnum, is_heading_towards};
 use reqwest::blocking::Client;
 use std::io::{self, Write};
 use std::{thread, time::Duration};
+use opencv::core::Point2f;
 
 fn drive(speed: f64, flip: bool) -> Result<(), Box<dyn std::error::Error>> {
     let client = reqwest::blocking::Client::new();
@@ -46,6 +47,7 @@ fn move_into_defaut_state() {
 
 fn main() {
     let mut state = State::default();
+    let mut previous_position: Option< (Point2f, Point2f, Point2f, Point2f)> = None;
 
     let goals = GoalClient::new("http://192.168.0.19:8000/goal");
 
@@ -66,10 +68,22 @@ fn main() {
             //loc if loc == goal.quadrant => {
             //    println!("We are going to win! Right quadrant {}.", goal.quadrant)
             //}
-            StateEnum::Location { our_position, .. } => println!(
-                "We have to move into right quadrant. (-> {}, remainng {:.1} s)",
-                goal.quadrant, goal.time_remaining
-            ),
+            StateEnum::Location { our_position, enemies, corners } => {
+
+                if (previous_position.is_none()) {
+                    match previous_position {
+                        Some(p) => {
+                            if (is_heading_towards(p.0, our_position.0, corners.0, 5.0)) {
+                                drive_direction("forward");
+                            } else {
+                                drive_direction("backward");
+                            }
+                        },
+                        _ => (),
+                    }
+                }
+                previous_position = Some(our_position);
+            }
         }
 
         thread::sleep(Duration::from_secs(3));
