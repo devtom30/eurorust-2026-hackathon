@@ -85,7 +85,23 @@ impl ImgState {
 
         println!("Detected tags: {:?}", objects.keys());
 
-        // TODO: add enemies
+        let mut enemies = Vec::new();
+        for key in objects.keys() {
+            if *key == OUR_ID ||
+                *key == CORNER1_ID ||
+                *key == CORNER2_ID ||
+                *key == CORNER3_ID ||
+                *key == CORNER4_ID {
+                continue;
+            }
+            let borders = objects.get(key).unwrap();
+            enemies.push((
+                borders.get(0)?.clone(),
+                borders.get(1)?.clone(),
+                borders.get(2)?.clone(),
+                borders.get(3)?.clone(),
+            ));
+        }
 
         Ok(())
     }
