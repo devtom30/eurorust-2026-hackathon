@@ -1,6 +1,8 @@
 mod goal;
 mod detection;
+mod image_fetcher;
 use goal::GoalClient;
+use image_fetcher::ImageFetcherClient;
 use std::{thread, time::Duration};
 
 fn get_current_location() -> String {
@@ -10,15 +12,22 @@ fn get_current_location() -> String {
 
 fn main() {
     let detector = detection::detector::Detector::new();
-    let img = detector.read_image("uber/img1.png");
-    let corners = detector.detect(&img);
-    for corner in corners {
-        println!("{:?}", corner);
-    }
+
+    let camera1 = ImageFetcherClient::new("http://192.168.0.118:50051/frame", "983149");
+    let camera2 = ImageFetcherClient::new("http://192.168.0.107:50051/frame", "378031");
     
     let goals = GoalClient::new("http://192.168.0.19:8000/goal");
 
     loop {
+        let img1 = camera1.get().unwrap();
+        let corners1 = detector.detect(&img1);
+        let img2 = camera2.get().unwrap();
+        let corners2 = detector.detect(&img2);
+
+        for corner in corners1.iter().zip(corners2) {
+            println!("{:?}", corner);
+        }
+        
         let goal = match goals.get() {
             Ok(g) => g,
             Err(e) => {

@@ -2,7 +2,6 @@ use opencv::{
     aruco,
     core::{Mat, Point2f, Ptr, Vector},
     imgcodecs,
-    prelude::*,
 };
 
 pub struct Detector {
@@ -14,12 +13,13 @@ pub struct Img {
     mat: Mat,
 }
 
-impl Img {
-    /// Decode an encoded image (PNG, JPEG, ...) from bytes, e.g. a reqwest response body.
-    pub fn from_bytes(bytes: &[u8]) -> opencv::Result<Self> {
-        let buf = Vector::<u8>::from_slice(bytes);
+impl TryFrom<&[u8]> for Img {
+    type Error = opencv::Error;
+    fn try_from(value: &[u8]) -> Result<Self, Self::Error> {
+        let buf = Vector::<u8>::from_slice(value);
         let mat = imgcodecs::imdecode(&buf, imgcodecs::IMREAD_COLOR)?;
-        Ok(Self { mat })
+        Ok(Img { mat })
+
     }
 }
 
