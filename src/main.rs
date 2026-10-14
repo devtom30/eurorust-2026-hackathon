@@ -9,11 +9,6 @@ use reqwest::blocking::Client;
 use std::io::{self, Write};
 use std::{thread, time::Duration};
 
-fn get_current_location() -> String {
-    // TODO: sem doplňte zjištění polohy (z kamery apod.)
-    String::from("BL")
-}
-
 fn drive(speed: f64, flip: bool) -> Result<(), Box<dyn std::error::Error>> {
     let client = reqwest::blocking::Client::new();
     let body = format!(r#"{{"speed":{speed},"flip":{flip}}}"#);
@@ -65,16 +60,14 @@ fn main() {
             }
         };
 
-        let current_location = get_current_location();
-
         match state.get_state() {
             StateEnum::Initializing => println!("Init positions, Figuring out"),
             StateEnum::NotFound => println!("Car is probably outside the camera!!!"),
             //loc if loc == goal.quadrant => {
             //    println!("We are going to win! Right quadrant {}.", goal.quadrant)
             //}
-            _ => println!(
-                "We have to move into right quadrant. ({current_location} -> {}, remainng {:.1} s)",
+            StateEnum::Location { our_position, .. } => println!(
+                "We have to move into right quadrant. (-> {}, remainng {:.1} s)",
                 goal.quadrant, goal.time_remaining
             ),
         }
