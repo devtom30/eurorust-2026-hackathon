@@ -1,10 +1,7 @@
 mod car;
 mod goal;
-<<<<<<< Updated upstream
 mod detection;
-=======
 
->>>>>>> Stashed changes
 use goal::GoalClient;
 use reqwest::blocking::Client;
 use std::io::{self, Write};
@@ -69,7 +66,7 @@ fn demo_movement() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 fn main() {
-<<<<<<< Updated upstream
+
     let detector = detection::detector::Detector::new();
     let img = detector.read_image("uber/img1.png");
     let corners = detector.detect(&img);
@@ -77,10 +74,8 @@ fn main() {
         println!("{:?}", corner);
     }
     
-=======
     demo_movement();
 
->>>>>>> Stashed changes
     let goals = GoalClient::new("http://192.168.0.19:8000/goal");
 
     loop {
