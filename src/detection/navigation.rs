@@ -143,7 +143,7 @@ pub enum StateEnum {
 
 impl State {
     pub fn update(&mut self) -> Result<()> {
-        self.img1_state.update()?;
+        //self.img1_state.update()?;
         self.img2_state.update()?;
 
         Ok(())
