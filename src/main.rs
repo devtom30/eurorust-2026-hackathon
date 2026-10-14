@@ -14,36 +14,31 @@ fn get_current_location() -> String {
     String::from("BL")
 }
 
-fn move_top(client: &Client) -> Result<(), reqwest::Error> {
-    println!("Move top.");
-    let max_attempts = 10;
+fn drive(speed: f64, flip: bool) -> Result<(), Box<dyn std::error::Error>> {
+    let client = reqwest::blocking::Client::new();
+    let body = format!(r#"{{"speed":{speed},"flip":{flip}}}"#);
 
-    for attempt in 1..=max_attempts {
-        match car::set_car(client, 0.5, false) {
-            Ok(()) => return Ok(()),
-            Err(e) if attempt < max_attempts => {
-                eprintln!("Atempt {attempt}/{max_attempts} failed: {e}, trying again...");
-                thread::sleep(Duration::from_millis(500));
-            }
-            Err(e) => return Err(e),
-        }
+    let resp = client
+        .put("http://192.168.0.149:5000")
+        .header("Content-Type", "application/json")
+        .header("Authorization", "838748")
+        .body(body)
+        .send()?;
+
+    println!("Status: {}", resp.status());
+    println!("{}", resp.text()?);
+    Ok(())
+}
+
+fn drive_direction(direction: &str) -> Result<(), Box<dyn std::error::Error>> {
+    match direction {
+        "forward" => drive(1.0, false)?,
+        "backward" => drive(-1.0, false)?,
+        "turn_left" => drive(0.2, true)?,
+        "turn_right" => drive(-0.2, true)?,
+        _ => println!("Unknown direction: {direction}"),
     }
-    unreachable!()
-}
-
-fn move_right() {
-    thread::sleep(Duration::from_secs(1));
-    println!("Move right.");
-}
-
-fn move_bottom() {
-    thread::sleep(Duration::from_secs(1));
-    println!("Move bottom.");
-}
-
-fn move_left() {
-    thread::sleep(Duration::from_secs(1));
-    println!("Move left.");
+    Ok(())
 }
 
 fn move_into_defaut_state() {
