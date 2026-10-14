@@ -49,22 +49,8 @@ fn move_into_defaut_state() {
     io::stdin().read_line(&mut buf).unwrap();
 }
 
-fn demo_movement() -> Result<(), Box<dyn std::error::Error>> {
-    move_into_defaut_state();
-    let client = Client::builder().timeout(Duration::from_secs(3)).build()?;
-
-    if let Err(e) = move_top(&client) {
-        eprintln!("Move top failed: {e}");
-    }
-    move_right();
-    move_bottom();
-    move_left();
-    Ok(())
-}
-
 fn main() {
     let mut state = State::default();
-    //demo_movement();
 
     let goals = GoalClient::new("http://192.168.0.19:8000/goal");
 
